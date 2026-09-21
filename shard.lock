@@ -1,0 +1,10 @@
+version: 2.0
+shards:
+  c0:
+    path: ../../../../Projects/c0/c0-cr
+    version: 0.9.1
+
+  jargon:
+    git: https://github.com/trans/jargon.git
+    version: 0.20.1
+

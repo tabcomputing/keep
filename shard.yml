@@ -1,0 +1,18 @@
+name: keep
+version: 0.1.0
+
+description: |
+  A commit log for a file: append-only commits of typed actions on a C0DATA
+  stream, a fold to rebuild state, checkpoints, revert marks and time travel.
+  The Delta Lake shape, for one document.
+
+authors:
+  - Thomas Sawyer <transfire@gmail.com>
+
+crystal: '>= 1.21.0'
+
+license: MIT
+
+dependencies:
+  c0:
+    path: ../../../../Projects/c0/c0-cr
