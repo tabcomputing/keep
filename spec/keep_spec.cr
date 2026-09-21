@@ -124,6 +124,17 @@ describe Keep::Log do
     end
   end
 
+  it "lets the holder of the lock append (the lock is reentrant per instance)" do
+    with_log do |path|
+      log = Keep::Log.open(path)
+      log.lock do
+        append(log, "inside") { |c| c.action("x") }
+        log.lock { append(log, "deeper") { |c| c.action("y") } }
+      end
+      log.commits.map(&.summary).should eq(["inside", "deeper"])
+    end
+  end
+
   it "serializes concurrent appends from two handles" do
     with_log do |path|
       a = Keep::Log.open(path)

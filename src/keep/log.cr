@@ -34,14 +34,32 @@ module Keep
     end
 
     # Run the block holding an exclusive advisory lock on the log, so two
-    # processes can't assign the same sequence number. Reentrant within a
-    # process only through the lock's own semantics; keep sections short.
+    # processes can't assign the same sequence number. Reentrant on the same
+    # `Log` instance (an application holding the lock around append-plus-
+    # checkpoint calls `append`, which locks again). Keep sections short.
     def lock(& : -> T) : T forall T
+      if @lock_depth > 0
+        @lock_depth += 1
+        begin
+          return yield
+        ensure
+          @lock_depth -= 1
+        end
+      end
       File.open(@path, "a") do |f|
-        f.flock_exclusive { return yield }
+        f.flock_exclusive do
+          @lock_depth = 1
+          begin
+            return yield
+          ensure
+            @lock_depth = 0
+          end
+        end
       end
       raise Error.new("unreachable")
     end
+
+    @lock_depth = 0
 
     # --- reading ----------------------------------------------------------
 
