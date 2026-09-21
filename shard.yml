@@ -15,4 +15,5 @@ license: MIT
 
 dependencies:
   c0:
-    path: /home/trans/Projects/c0/c0-cr
+    github: c0data/c0-cr
+    version: ~> 0.10
