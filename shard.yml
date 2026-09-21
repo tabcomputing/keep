@@ -15,4 +15,4 @@ license: MIT
 
 dependencies:
   c0:
-    path: ../../../../Projects/c0/c0-cr
+    path: /home/trans/Projects/c0/c0-cr
