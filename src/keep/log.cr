@@ -161,7 +161,7 @@ module Keep
       a.fields.each do |f|
         case f
         in String        then b.field(f)
-        in Array(String) then b.nested_field(f)
+        in Array(String) then b.list_field(f)
         end
       end
     end
@@ -191,32 +191,12 @@ module Keep
       fields = (1...rec.field_count).map do |i|
         raw = rec.field(i)
         if raw.size > 0 && raw[0] == C0::STX
-          parse_list(raw).as(Action::Field)
+          rec.list(i).map { |item| String.new(item) }.as(Action::Field)
         else
           String.new(C0.unescape(raw)).as(Action::Field)
         end
       end
       Action.new(name, fields)
-    end
-
-    # The units of one STX…ETX scope, DLE-escapes honoured.
-    private def parse_list(raw : Bytes) : Array(String)
-      items = [] of String
-      inner = raw[1, raw.size - 2] # strip STX / ETX
-      start = 0
-      i = 0
-      while i < inner.size
-        case inner[i]
-        when C0::DLE then i += 2
-        when C0::US
-          items << String.new(C0.unescape(inner[start...i]))
-          i += 1
-          start = i
-        else i += 1
-        end
-      end
-      items << String.new(C0.unescape(inner[start...inner.size])) unless inner.size == 0
-      items
     end
 
     private def resolve_reverts(all : Array(Commit)) : Array(Commit)
